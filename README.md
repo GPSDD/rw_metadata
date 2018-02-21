@@ -1,10 +1,6 @@
-# Resource Watch Metadata Microservice
+# Metadata Microservice
 
-This repository implements the metadata services that are available in the Resource Watch API.
-
-If you are looking for the API Doc (Info and Usage) please go to the next link:
-[View the documentation for this
-API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/resource-watch/rw_metadata/master/application/microservice/swagger.yml#/) (not yet)
+This repository implements the metadata services that are available in the API.
 
 ## Quick Overview
 
@@ -12,23 +8,11 @@ API](http://gfw-api.github.io/swagger-ui/?url=https://raw.githubusercontent.com/
 
 ```
 dataset: <String>, required
-application: <String>, required
-resource: {
-    id: <String>, required
-    type: <String>, required, [dataset, widget, layer]
-},
 language: <String>, required
 name: <String>
-description: <String>
-source: <String>
-citation: <String>
-license: <String>
-units: <Object>
 info: <Object>
-fields: <Object>
 createdAt: <Date>
 updatedAt: <Date>
-status: <String>, [published, unpublished]
 ```
 
 ### Dataset Metadata
@@ -74,13 +58,12 @@ POST: /dataset/:dataset/layer/metadata/find-by-ids
 
 ### POST, PATCH, DELETE
 
-"application" and "language" attributes are required and it is mandatory to include them in the payload (when doing CRUD requests).
+"language" attribute is required and it is mandatory to include them in the payload (when doing CRUD requests).
 **This doesn't apply to the FindByIds Endpoints**
 
 ### GET Queryparam Filters:
 
 ```
-application: gfw, gfw-climate, prep, rw, forest-atlas (select one or some of them)
 language: select between available languages (select one or some of them)
 limit: desired number
 ```
@@ -98,35 +81,35 @@ type: [dataset, widget, layer]
 GET: /dataset/111123/metadata
 GET: /dataset/111123/widget/134599/metadata
 GET: /dataset/111123/layer/134599/metadata
-GET: /dataset/111123/metadata?application=rw&language=es,en&limit=20
-GET: /dataset/111123/widget/134599/metadata?application=rw,gfw&language=en
+GET: /dataset/111123/metadata?language=es,en&limit=20
+GET: /dataset/111123/widget/134599/metadata?language=en
 GET: /dataset/111123/layer/134599/metadata?language=en
 ```
 
 #### Creating
 
 ```
-POST: /dataset/111123/metadata -> payload: {"application": "rw", "language": "es"}
-POST: /dataset/111123/widget/134599/metadata -> payload: {"application": "rw", "language": "es"}
-POST: /dataset/111123/layer/134599/metadata -> payload: {"application": "rw", "language": "es"}
-POST: /dataset/111123/layer/134599/metadata -> payload: {"application": "rw", "language": "es", "name": "M1", "info": {"a": "a", "b": "b"}}
+POST: /dataset/111123/metadata -> payload: {"language": "es"}
+POST: /dataset/111123/widget/134599/metadata -> payload: {"language": "es"}
+POST: /dataset/111123/layer/134599/metadata -> payload: {"language": "es"}
+POST: /dataset/111123/layer/134599/metadata -> payload: {"language": "es", "name": "M1", "info": {"a": "a", "b": "b"}}
 ```
 
 #### Updating (partial)
 
 ```
-PATCH: /dataset/111123/metadata -> payload: {"application": "rw", "language": "es", "name": "M0", "info": {"a": "A", "b": "B"}}
-PATCH: /dataset/111123/widget/134599/metadata -> payload: {"application": "rw", "language": "es", "name": "M1", "info": {"c": "C", "d": "D"}}
-PATCH: /dataset/111123/layer/134599/metadata -> payload: {"application": "rw", "language": "es", "name": "M2", "info": {"e": "E", "f": "F"}}
-PATCH: /dataset/111123/layer/134599/metadata -> payload: {"application": "rw", "language": "es", "name": "M3", "info": {"g": "G", "h": "H"}}
+PATCH: /dataset/111123/metadata -> payload: {"language": "es", "name": "M0", "info": {"a": "A", "b": "B"}}
+PATCH: /dataset/111123/widget/134599/metadata -> payload: {"language": "es", "name": "M1", "info": {"c": "C", "d": "D"}}
+PATCH: /dataset/111123/layer/134599/metadata -> payload: {"language": "es", "name": "M2", "info": {"e": "E", "f": "F"}}
+PATCH: /dataset/111123/layer/134599/metadata -> payload: {"language": "es", "name": "M3", "info": {"g": "G", "h": "H"}}
 ```
 
 #### Deleting
 
 ```
-DELETE: /dataset/111123/metadata?application=rw&language=en
-DELETE: /dataset/111123/widget/134599/metadata?application=rw&language=es
-DELETE: /dataset/111123/layer/134599/metadata?application=gfw&language=en
+DELETE: /dataset/111123/metadata?language=en
+DELETE: /dataset/111123/widget/134599/metadata?language=es
+DELETE: /dataset/111123/layer/134599/metadata?language=en
 ```
 
 #### Getting All
@@ -135,8 +118,8 @@ DELETE: /dataset/111123/layer/134599/metadata?application=gfw&language=en
 GET: /metadata
 GET: /metadata?type=dataset
 GET: /metadata?type=widget
-GET: /metadata?application=rw&language=es,en&limit=20
-GET: /metadata?application=rw,gfw&language=en&type=dataset
+GET: /metadata?language=es,en&limit=20
+GET: /metadata?language=en&type=dataset
 GET: /metadata?language=en
 ```
 
@@ -149,9 +132,9 @@ payload -> {"ids": "112313, 111123"}
 
 ```
 POST: /dataset/metadata/find-by-ids -> payload: {"ids": ["112313", "111123"]}
-POST: /dataset/metadata/find-by-ids?application=rw&language=es,en&limit=20 -> payload: {"ids": "112313, 111123"}
-POST: /dataset/111123/widget/metadata/find-by-ids, -> payload: {"ids": "112313, 111123"}
-POST: /dataset/111123/widget/metadata/find-by-ids?application=rw,gfw&language=es&limit=200 -> payload: {"ids": ["112313", "111123"]}
+POST: /dataset/metadata/find-by-ids?language=es,en&limit=20 -> payload: {"ids": "112313, 111123"}
+POST: /dataset/111123/widget/metadata/find-by-ids -> payload: {"ids": "112313, 111123"}
+POST: /dataset/111123/widget/metadata/find-by-ids?language=es&limit=200 -> payload: {"ids": ["112313", "111123"]}
 ```
 
 Ir order to contribute to this repo:
@@ -161,8 +144,6 @@ Ir order to contribute to this repo:
 
 ## Getting Started
 
-### OS X
-
 **First, make sure that you have the [API gateway running
 locally](https://github.com/control-tower/control-tower).**
 
@@ -170,14 +151,6 @@ We're using Docker which, luckily for you, means that getting the
 application running locally should be fairly painless. First, make sure
 that you have [Docker Compose](https://docs.docker.com/compose/install/)
 installed on your machine.
-
-If you've not used Docker before, you may need to set up some defaults:
-
-```
-docker-machine create --driver virtualbox default
-docker-machine start default
-eval $(docker-machine env default)
-```
 
 You also need to configure an alias for your local machine:
 
@@ -193,7 +166,7 @@ Modify the /etc/hosts config file adding a new rule:
 vim /etc/hosts
 ```
 
-Now we're ready to actually get the application running:
+Now we're ready to actually get the microservice running:
 
 ```
 git clone https://github.com/resource-watch/rw_metadata
@@ -202,7 +175,3 @@ cd rw_metadata
 ```
 
 You can now access the microservice through the API gateway.
-
-## Deployment
-
-In progress...

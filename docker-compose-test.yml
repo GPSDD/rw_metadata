@@ -4,7 +4,7 @@ test:
     service: base
   ports:
     - "4000"
-  container_name: rw-metadata-test
+  container_name: metadata-test
   environment:
     NODE_ENV: test
   command: test

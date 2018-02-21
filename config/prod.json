@@ -1,6 +1,6 @@
 {
     "logger": {
-        "name": "rw-metadata",
+        "name": "metadata",
         "level": "warn",
         "toFile": false,
         "dirLogFile": null

@@ -1,6 +1,6 @@
 {
-  "name": "rw-metadata",
-  "version": "2.3.0",
+  "name": "metadata-microservice",
+  "version": "1.0.0",
   "description": "Resource Watch - Metadata",
   "main": "index.js",
   "scripts": {
@@ -9,10 +9,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/resource-watch/rw_metadata.git"
+    "url": "git+https://github.com/GPSDD/rw_metadata.git"
   },
   "keywords": [
-    "rw",
     "api2",
     "microservice",
     "node",
@@ -24,10 +23,6 @@
     "rrequero"
   ],
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/resource-watch/rw_metadata/issues"
-  },
-  "homepage": "https://github.com/resource-watch/rw_metadata#readme",
   "dependencies": {
     "bunyan": "1.8.5",
     "co": "4.6.0",

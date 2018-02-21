@@ -17,21 +17,11 @@ class MetadataSerializer {
                     type: 'metadata',
                     attributes: {
                         dataset: el.dataset,
-                        application: el.application,
-                        resource: el.resource,
                         language: el.language,
                         name: el.name,
-                        description: el.description,
-                        source: el.source,
-                        citation: el.citation,
-                        license: el.license,
-                        units: el.units,
                         info: el.info,
-                        columns: el.columns,
-                        applicationProperties: el.applicationProperties,
                         createdAt: el.createdAt,
                         updatedAt: el.updatedAt,
-                        status: el.status
                     }
                 });
             });
