@@ -14,47 +14,22 @@ const router = new Router();
 
 class MetadataRouter {
 
-    static getResource(params) {
-        let resource = { id: params.dataset, type: 'dataset' };
-        if (params.layer) {
-            resource = { id: params.layer, type: 'layer' };
-        } else if (params.widget) {
-            resource = { id: params.widget, type: 'widget' };
-        } else {
-            // do nothing
-        }
-        return resource;
-    }
-
-    static getResourceTypeByPath(path) {
-        let type = 'dataset';
-        if (path.indexOf('layer') > -1) {
-            type = 'layer';
-        } else if (path.indexOf('widget') > -1) {
-            type = 'widget';
-        } else {
-            // do nothing
-        }
-        return type;
-    }
-
     static async get(ctx) {
-        const resource = MetadataRouter.getResource(ctx.params);
-        logger.info(`Getting metadata of ${resource.type}: ${resource.id}`);
+        const dataset = ctx.params.dataset;
+        logger.info(`Getting metadata of dataset: ${dataset}`);
         const filter = {};
-        if (ctx.query.application) { filter.application = ctx.query.application; }
         if (ctx.query.language) { filter.language = ctx.query.language; }
         if (ctx.query.limit) { filter.limit = ctx.query.limit; }
-        const result = await MetadataService.get(ctx.params.dataset, resource, filter);
+        const result = await MetadataService.get(dataset, filter);
         ctx.body = MetadataSerializer.serialize(result);
     }
 
     static async create(ctx) {
-        const resource = MetadataRouter.getResource(ctx.params);
-        logger.info(`Creating metadata of ${resource.type}: ${resource.id}`);
+        const dataset = ctx.params.dataset;
+        logger.info(`Creating metadata of dataset: ${dataset}`);
         try {
             const user = ctx.request.body.loggedUser;
-            const result = await MetadataService.create(user, ctx.params.dataset, resource, ctx.request.body);
+            const result = await MetadataService.create(user, dataset, ctx.request.body);
             ctx.body = MetadataSerializer.serialize(result);
         } catch (err) {
             if (err instanceof MetadataDuplicated) {
@@ -66,10 +41,10 @@ class MetadataRouter {
     }
 
     static async update(ctx) {
-        const resource = MetadataRouter.getResource(ctx.params);
-        logger.info(`Updating metadata of ${resource.type}: ${resource.id}`);
+        const dataset = ctx.params.dataset;
+        logger.info(`Updating metadata of dataset: ${dataset}`);
         try {
-            const result = await MetadataService.update(ctx.params.dataset, resource, ctx.request.body);
+            const result = await MetadataService.update(ctx.params.dataset, ctx.request.body);
             ctx.body = MetadataSerializer.serialize(result);
         } catch (err) {
             if (err instanceof MetadataNotFound) {
@@ -81,13 +56,12 @@ class MetadataRouter {
     }
 
     static async delete(ctx) {
-        const resource = MetadataRouter.getResource(ctx.params);
-        logger.info(`Deleting metadata of ${resource.type}: ${resource.id}`);
+        const dataset = ctx.params.dataset;
+        logger.info(`Deleting metadata of dataset: ${dataset}`);
         const filter = {};
-        if (ctx.query.application) { filter.application = ctx.query.application; }
         if (ctx.query.language) { filter.language = ctx.query.language; }
         try {
-            const result = await MetadataService.delete(ctx.params.dataset, resource, filter);
+            const result = await MetadataService.delete(dataset, filter);
             ctx.body = MetadataSerializer.serialize(result);
         } catch (err) {
             if (err instanceof MetadataNotFound) {
@@ -101,42 +75,35 @@ class MetadataRouter {
     static async getAll(ctx) {
         logger.info('Getting all metadata');
         const filter = {};
-        const extendedFilter = {};
-        if (ctx.query.application) { filter.application = ctx.query.application; }
         if (ctx.query.language) { filter.language = ctx.query.language; }
         if (ctx.query.limit) { filter.limit = ctx.query.limit; }
-        if (ctx.query.type) { extendedFilter.type = ctx.query.type; }
-        const result = await MetadataService.getAll(filter, extendedFilter);
+        const result = await MetadataService.getAll(filter);
         ctx.body = MetadataSerializer.serialize(result);
     }
 
     static async getByIds(ctx) {
-        if (!ctx.request.body.ids) {
+        let datasets = ctx.request.body.ids;
+        if (!datasets) {
             ctx.throw(400, 'Bad request');
             return;
         }
-        logger.info(`Getting metadata by ids: ${ctx.request.body.ids}`);
-        const resource = {
-            ids: ctx.request.body.ids
-        };
-        if (typeof resource.ids === 'string') {
-            resource.ids = resource.ids.split(',').map((elem) => elem.trim());
+        logger.info(`Getting metadata by ids: ${datasets}`);
+        if (typeof datasets === 'string') {
+            datasets = datasets.split(',').map((elem) => elem.trim());
         }
-        resource.type = MetadataRouter.getResourceTypeByPath(ctx.path);
         const filter = {};
-        if (ctx.query.application) { filter.application = ctx.query.application; }
         if (ctx.query.language) { filter.language = ctx.query.language; }
-        const result = await MetadataService.getByIds(resource, filter);
+        const result = await MetadataService.getByIds(datasets, filter);
         ctx.body = MetadataSerializer.serialize(result);
     }
 
     static async clone(ctx) {
-        const resource = MetadataRouter.getResource(ctx.params);
+        const dataset = ctx.params.dataset;
         const newDataset = ctx.request.body.newDataset;
-        logger.info(`Cloning metadata of ${resource.type}: ${resource.id} in ${newDataset}`);
+        logger.info(`Cloning metadata of dataset: ${dataset} in ${newDataset}`);
         try {
             const user = ctx.request.body.loggedUser;
-            const result = await MetadataService.clone(user, ctx.params.dataset, resource, ctx.request.body);
+            const result = await MetadataService.clone(user, dataset, ctx.request.body);
             ctx.body = MetadataSerializer.serialize(result);
         } catch (err) {
             if (err instanceof MetadataDuplicated) {
@@ -152,7 +119,7 @@ class MetadataRouter {
 // Negative checking
 const authorizationMiddleware = async (ctx, next) => {
     // Check delete
-    if (ctx.request.method === 'DELETE' && (!ctx.request.query.language || !ctx.request.query.application)) {
+    if (ctx.request.method === 'DELETE' && (!ctx.request.query.language)) {
         ctx.throw(400, 'Bad request');
         return;
     }
@@ -170,16 +137,10 @@ const authorizationMiddleware = async (ctx, next) => {
         ctx.throw(403, 'Forbidden'); // if USER -> out
         return;
     }
-    // Get application from query (delete) or body (post-patch)
-    const application = ctx.request.query.application ? ctx.request.query.application : ctx.request.body.application;
     if (user.role === 'MANAGER' || user.role === 'ADMIN') {
-        if (user.extraUserData.apps.indexOf(application) === -1) {
-            ctx.throw(403, 'Forbidden'); // if manager or admin but no application -> out
-            return;
-        }
         if (user.role === 'MANAGER' && ctx.request.method !== 'POST') { // extra check if a MANAGER wants to update or delete
-            const resource = MetadataRouter.getResource(ctx.params);
-            const permission = await MetadataService.hasPermission(user, ctx.params.dataset, resource, ctx.request.body);
+            const dataset = ctx.params.dataset;
+            const permission = await MetadataService.hasPermission(user, dataset, ctx.request.body);
             if (!permission) {
                 ctx.throw(403, 'Forbidden');
                 return;
@@ -223,21 +184,9 @@ router.post('/dataset/:dataset/metadata', validationMiddleware, authorizationMid
 router.post('/dataset/:dataset/metadata/clone', cloneValidationMiddleware, authorizationMiddleware, MetadataRouter.clone);
 router.patch('/dataset/:dataset/metadata', validationMiddleware, authorizationMiddleware, MetadataRouter.update);
 router.delete('/dataset/:dataset/metadata', authorizationMiddleware, MetadataRouter.delete);
-// widget
-router.get('/dataset/:dataset/widget/:widget/metadata', MetadataRouter.get);
-router.post('/dataset/:dataset/widget/:widget/metadata', validationMiddleware, authorizationMiddleware, MetadataRouter.create);
-router.patch('/dataset/:dataset/widget/:widget/metadata', validationMiddleware, authorizationMiddleware, MetadataRouter.update);
-router.delete('/dataset/:dataset/widget/:widget/metadata', authorizationMiddleware, MetadataRouter.delete);
-// layer
-router.get('/dataset/:dataset/layer/:layer/metadata', MetadataRouter.get);
-router.post('/dataset/:dataset/layer/:layer/metadata', validationMiddleware, authorizationMiddleware, MetadataRouter.create);
-router.patch('/dataset/:dataset/layer/:layer/metadata', validationMiddleware, authorizationMiddleware, MetadataRouter.update);
-router.delete('/dataset/:dataset/layer/:layer/metadata', authorizationMiddleware, MetadataRouter.delete);
 // generic
 router.get('/metadata', MetadataRouter.getAll);
 // get by id
 router.post('/dataset/metadata/get-by-ids', MetadataRouter.getByIds);
-router.post('/dataset/:dataset/widget/metadata/get-by-ids', MetadataRouter.getByIds);
-router.post('/dataset/:dataset/layer/metadata/get-by-ids', MetadataRouter.getByIds);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 FROM mhart/alpine-node:7.6
 MAINTAINER raul.requero@vizzuality.com
 
-ENV NAME rw-metadata
+ENV NAME metadata
 ENV USER microservice
 
 RUN apk update && apk upgrade && \

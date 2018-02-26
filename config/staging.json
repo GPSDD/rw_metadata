@@ -1,6 +1,6 @@
 {
     "logger": {
-        "name": "rw-metadata-STAGING",
+        "name": "metadata-STAGING",
         "level": "info",
         "toFile": false,
         "dirLogFile": null

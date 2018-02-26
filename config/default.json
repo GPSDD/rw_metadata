@@ -1,17 +1,17 @@
 {
     "logger": {
-        "name": "rw-metadata-DEV",
+        "name": "metadata-DEV",
         "level": "debug",
         "toFile": false,
         "dirLogFile": null
     },
     "service": {
-        "name": "RW Metadata API",
+        "name": "Metadata microservice",
         "uri": "http://mymachine:4000",
         "port": 4000
     },
     "mongodb":{
-        "database": "rw_metadata_db",
+        "database": "metadata_db",
         "host": "http://mymachine",
         "port": 27017
     }

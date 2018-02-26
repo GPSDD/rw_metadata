@@ -1,6 +1,6 @@
 {
     "logger": {
-        "name": "rw-metadata-TEST",
+        "name": "metadata-TEST",
         "level": "debug",
         "toFile": false,
         "dirLogFile": null
