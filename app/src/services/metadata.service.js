@@ -40,7 +40,16 @@ class MetadataService {
             language: body.language,
             userId: user.id,
             name: body.name,
-            info: body.info
+            description: body.description,
+            sourceOrganization: body.sourceOrganization,
+            dataSourceUrl: body.dataSourceUrl,
+            dataSourceEndpoint: body.dataSourceEndpoint,
+            info: body.info,
+            citation: body.citation,
+            license: body.license,
+            units: body.units,
+            columns: body.columns,
+            countries: body.countries
         });
         return await metadata.save();
     }
@@ -63,7 +72,16 @@ class MetadataService {
         }
         logger.debug('Updating metadata');
         metadata.name = body.name ? body.name : metadata.name;
+        metadata.description = body.description ? body.description : metadata.description;
+        metadata.sourceOrganization = body.sourceOrganization ? body.sourceOrganization : metadata.sourceOrganization;
+        metadata.dataSourceUrl = body.dataSourceUrl ? body.dataSourceUrl : metadata.dataSourceUrl;
+        metadata.dataSourceEndpoint = body.dataSourceEndpoint ? body.dataSourceEndpoint : metadata.dataSourceEndpoint;
         metadata.info = body.info ? body.info : metadata.info;
+        metadata.citation = body.citation ? body.citation : metadata.citation;
+        metadata.license = body.license ? body.license : metadata.license;
+        metadata.units = body.units ? body.units : metadata.units;
+        metadata.columns = body.columns ? body.columns : metadata.columns;
+        metadata.countries = body.countries ? body.countries : metadata.countries;
         metadata.updatedAt = new Date();
         return await metadata.save();
     }

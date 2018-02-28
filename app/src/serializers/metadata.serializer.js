@@ -19,9 +19,19 @@ class MetadataSerializer {
                         dataset: el.dataset,
                         language: el.language,
                         name: el.name,
+                        description: el.description,
+                        sourceOrganization: el.sourceOrganization,
+                        dataSourceUrl: el.dataSourceUrl,
+                        dataSourceEndpoint: el.dataSourceEndpoint,
                         info: el.info,
+                        citation: el.citation,
+                        license: el.license,
+                        units: el.units,
+                        columns: el.columns,
+                        countries: el.countries,
                         createdAt: el.createdAt,
                         updatedAt: el.updatedAt,
+                        status: el.status
                     }
                 });
             });
