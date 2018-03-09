@@ -21,7 +21,7 @@ class MetadataRouter {
         if (ctx.query.language) { filter.language = ctx.query.language; }
         if (ctx.query.limit) { filter.limit = ctx.query.limit; }
         const result = await MetadataService.get(dataset, filter);
-        ctx.body = MetadataSerializer.serialize(result);
+        ctx.body = await MetadataSerializer.serialize(result);
     }
 
     static async create(ctx) {
@@ -30,7 +30,7 @@ class MetadataRouter {
         try {
             const user = ctx.request.body.loggedUser;
             const result = await MetadataService.create(user, dataset, ctx.request.body);
-            ctx.body = MetadataSerializer.serialize(result);
+            ctx.body = await MetadataSerializer.serialize(result);
         } catch (err) {
             if (err instanceof MetadataDuplicated) {
                 ctx.throw(400, err.message);
@@ -45,7 +45,7 @@ class MetadataRouter {
         logger.info(`Updating metadata of dataset: ${dataset}`);
         try {
             const result = await MetadataService.update(ctx.params.dataset, ctx.request.body);
-            ctx.body = MetadataSerializer.serialize(result);
+            ctx.body = await MetadataSerializer.serialize(result);
         } catch (err) {
             if (err instanceof MetadataNotFound) {
                 ctx.throw(404, err.message);
@@ -62,7 +62,7 @@ class MetadataRouter {
         if (ctx.query.language) { filter.language = ctx.query.language; }
         try {
             const result = await MetadataService.delete(dataset, filter);
-            ctx.body = MetadataSerializer.serialize(result);
+            ctx.body = await MetadataSerializer.serialize(result);
         } catch (err) {
             if (err instanceof MetadataNotFound) {
                 ctx.throw(404, err.message);
@@ -78,7 +78,7 @@ class MetadataRouter {
         if (ctx.query.language) { filter.language = ctx.query.language; }
         if (ctx.query.limit) { filter.limit = ctx.query.limit; }
         const result = await MetadataService.getAll(filter);
-        ctx.body = MetadataSerializer.serialize(result);
+        ctx.body = await MetadataSerializer.serialize(result);
     }
 
     static async getByIds(ctx) {
@@ -94,7 +94,7 @@ class MetadataRouter {
         const filter = {};
         if (ctx.query.language) { filter.language = ctx.query.language; }
         const result = await MetadataService.getByIds(datasets, filter);
-        ctx.body = MetadataSerializer.serialize(result);
+        ctx.body = await MetadataSerializer.serialize(result);
     }
 
     static async clone(ctx) {
@@ -104,7 +104,7 @@ class MetadataRouter {
         try {
             const user = ctx.request.body.loggedUser;
             const result = await MetadataService.clone(user, dataset, ctx.request.body);
-            ctx.body = MetadataSerializer.serialize(result);
+            ctx.body = await MetadataSerializer.serialize(result);
         } catch (err) {
             if (err instanceof MetadataDuplicated) {
                 ctx.throw(400, err.message);
