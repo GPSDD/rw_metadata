@@ -1,8 +1,22 @@
+const ctRegisterMicroservice = require('ct-register-microservice-node');
+const logger = require('logger');
 
 class MetadataSerializer {
 
-    static serialize(data) {
+    static async getDatasetTableName(dataset) {
+        try {
+            const result = await ctRegisterMicroservice.requestToMicroservice({
+                uri: `/v1/dataset/${dataset}`,
+                method: 'GET',
+                json: true
+            });
+            return result.data.attributes.tableName;
+        } catch (e) {
+            throw new Error(e);
+        }
+    }
 
+    static async serialize(data) {
         const result = {
             data: []
         };
@@ -11,30 +25,37 @@ class MetadataSerializer {
             if (!Array.isArray(data)) {
                 serializeData = [data];
             }
-            serializeData.forEach((el) => {
-                result.data.push({
+            const metadata = await Promise.all(serializeData.map(async (el) => {
+                const tableName = await MetadataSerializer.getDatasetTableName(el.dataset);
+                logger.debug(tableName);
+                return {
                     id: el._id,
                     type: 'metadata',
                     attributes: {
                         dataset: el.dataset,
+                        application: el.application,
+                        resource: el.resource,
                         language: el.language,
                         name: el.name,
                         description: el.description,
-                        sourceOrganization: el.sourceOrganization,
-                        dataSourceUrl: el.dataSourceUrl,
-                        dataSourceEndpoint: el.dataSourceEndpoint,
-                        info: el.info,
+                        source: el.source,
                         citation: el.citation,
                         license: el.license,
                         units: el.units,
+                        info: el.info,
                         columns: el.columns,
-                        countries: el.countries,
+                        applicationProperties: el.applicationProperties,
                         createdAt: el.createdAt,
                         updatedAt: el.updatedAt,
-                        status: el.status
+                        status: el.status,
+                        dataDownloadUrl: {
+                            csv: `/v1/download/${el.dataset}?sql=select * from ${tableName}&format=csv`,
+                            json: `/v1/download/${el.dataset}?sql=select * from ${tableName}&format=json`
+                        }
                     }
-                });
-            });
+                };
+            }));
+            result.data = metadata;
         }
         return result;
     }
