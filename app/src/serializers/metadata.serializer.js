@@ -6,7 +6,7 @@ class MetadataSerializer {
     static async getDatasetTableName(dataset) {
         try {
             const result = await ctRegisterMicroservice.requestToMicroservice({
-                uri: `/v1/dataset/${dataset}`,
+                uri: `/dataset/${dataset}`,
                 method: 'GET',
                 json: true
             });
