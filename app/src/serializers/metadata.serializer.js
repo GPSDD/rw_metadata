@@ -33,25 +33,26 @@ class MetadataSerializer {
                     type: 'metadata',
                     attributes: {
                         dataset: el.dataset,
-                        application: el.application,
-                        resource: el.resource,
                         language: el.language,
                         name: el.name,
                         description: el.description,
-                        source: el.source,
-                        citation: el.citation,
-                        license: el.license,
-                        units: el.units,
-                        info: el.info,
-                        columns: el.columns,
-                        applicationProperties: el.applicationProperties,
-                        createdAt: el.createdAt,
-                        updatedAt: el.updatedAt,
-                        status: el.status,
+                        sourceOrganization: el.sourceOrganization,
+                        dataSourceUrl: el.dataSourceUrl,
+                        dataSourceEndpoint: el.dataSourceEndpoint,
                         dataDownloadUrl: {
                             csv: `/v1/download/${el.dataset}?sql=select * from ${tableName}&format=csv`,
                             json: `/v1/download/${el.dataset}?sql=select * from ${tableName}&format=json`
-                        }
+                        },
+                        info: el.info,
+                        citation: el.citation,
+                        license: el.license,
+                        units: el.units,
+                        columns: el.columns,
+                        countries: el.countries,
+                        userId: el.userId,
+                        createdAt: el.createdAt,
+                        updatedAt: el.updatedAt,
+                        status: el.status
                     }
                 };
             }));
