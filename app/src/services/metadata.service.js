@@ -101,11 +101,16 @@ class MetadataService {
         return metadata;
     }
 
-    static async getAll(filter) {
+    static async getAll(filter, page, limit) {
         const finalFilter = MetadataService.getFilter(filter);
-        const limit = (isNaN(parseInt(filter.limit, 10))) ? 0 : parseInt(filter.limit, 10);
         logger.debug('Getting metadata');
-        return await Metadata.find(finalFilter).limit(limit).exec();
+        const options = {
+            page,
+            limit
+        };
+        let pages = await Metadata.paginate(finalFilter, options);
+        pages = Object.assign({}, pages);
+        return pages;
     }
 
     static async getByIds(datasets, filter) {
