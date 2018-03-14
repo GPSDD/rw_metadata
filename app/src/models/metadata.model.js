@@ -1,5 +1,6 @@
 
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
 const Schema = mongoose.Schema;
 const STATUS = require('app.constants').STATUS;
 
@@ -23,5 +24,7 @@ const Metadata = new Schema({
     updatedAt: { type: Date, default: Date.now },
     status: { type: String, enum: STATUS, default: 'published' }
 });
+
+Metadata.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('Metadata', Metadata);

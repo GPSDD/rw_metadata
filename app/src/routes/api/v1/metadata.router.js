@@ -77,8 +77,12 @@ class MetadataRouter {
         const filter = {};
         if (ctx.query.language) { filter.language = ctx.query.language; }
         if (ctx.query.limit) { filter.limit = ctx.query.limit; }
-        const result = await MetadataService.getAll(filter);
-        ctx.body = await MetadataSerializer.serialize(result);
+        const page = ctx.query['page[number]'] ? parseInt(ctx.query['page[number]'], 10) : 1;
+        const limit = ctx.query['page[size]'] ? parseInt(ctx.query['page[size]'], 10) : 10;
+        const apiVersion = ctx.mountPath.split('/')[ctx.mountPath.split('/').length - 1];
+        const link = `${ctx.request.protocol}://${ctx.request.host}/${apiVersion}${ctx.request.path}`;
+        const result = await MetadataService.getAll(filter, page, limit);
+        ctx.body = await MetadataSerializer.serialize(result, link);
     }
 
     static async getByIds(ctx) {
