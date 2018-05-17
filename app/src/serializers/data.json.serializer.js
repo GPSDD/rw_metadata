@@ -1,3 +1,4 @@
+const config = require('config');
 const ctRegisterMicroservice = require('ct-register-microservice-node');
 
 class DataJsonSerializer {
@@ -27,7 +28,7 @@ class DataJsonSerializer {
             contactPoint: el.sourceOrganization || '',
             identifier: el._id,
             accessLevel: 'public',
-            mbox: 'info@Data4SDGS.org',
+            mbox: config.appSettings.dataJsonEmail,
             accessLevelComment: '',
             distribution: [
                 {
