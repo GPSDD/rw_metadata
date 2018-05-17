@@ -4,6 +4,7 @@
         "port": "MONGO_PORT_27017_TCP_PORT"
     },
     "service": {
-        "port": "PORT"
+        "port": "PORT",
+        "uri": "HOST_IP"
     }
 }

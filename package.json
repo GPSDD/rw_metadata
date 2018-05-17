@@ -4,8 +4,8 @@
   "description": "Resource Watch - Metadata",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_PATH=app/src node app/index.js",
-    "test": "NODE_PATH=app/src NODE_ENV=test grunt --gruntfile app/Gruntfile.js test"
+    "test": "NODE_PATH=app/src node $NODE_DEBUG_OPTION ./node_modules/.bin/grunt --gruntfile app/Gruntfile.js e2eTest",
+    "start": "NODE_PATH=app/src node $NODE_DEBUG_OPTION app/index.js"
   },
   "repository": {
     "type": "git",
@@ -40,7 +40,8 @@
     "lodash": "4.2.0",
     "mongoose": "^5.0.10",
     "mongoose-paginate": "^5.0.3",
-    "newrelic": "1.27.1"
+    "newrelic": "1.27.1",
+    "nock": "^9.2.5"
   },
   "devDependencies": {
     "co-mocha": "1.1.2",

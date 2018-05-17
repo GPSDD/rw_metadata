@@ -15,6 +15,14 @@ module.exports = (grunt) => {
                     port: process.env.PORT,
                     output: 'started'
                 }
+            },
+            test: {
+                options: {
+                    script: 'app/index.js',
+                    node_env: 'dev',
+                    port: process.env.PORT,
+                    output: 'started'
+                }
             }
         },
 
@@ -74,7 +82,7 @@ module.exports = (grunt) => {
 
     grunt.registerTask('unitTest', ['mochaTest:unit']);
 
-    grunt.registerTask('e2eTest', ['mochaTest:e2e']);
+    grunt.registerTask('e2eTest', ['express:test', 'mochaTest:e2e']);
 
     grunt.registerTask('e2eTest-watch', ['watch:e2eTest']);
 

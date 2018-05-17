@@ -18,6 +18,7 @@ const koaBody = require('koa-body')({
 });
 
 const onDbReady = (err) => {
+    logger.info('Connected to MongoDB at ', mongoUri);
     if (err) {
         logger.error(err);
         throw new Error(err);
