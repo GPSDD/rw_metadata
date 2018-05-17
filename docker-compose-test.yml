@@ -11,9 +11,6 @@ test:
   command: test
   links:
     - mongo
-  extra_hosts:
-    - "mymachine:${HOST_IP}"
-
 mongo:
   image: mongo:3.4
   command: --smallfiles
