@@ -2,9 +2,21 @@ test:
   extends:
     file: base.yml
     service: base
-  ports:
-    - "4000"
-  container_name: metadata-test
+  container_name: metadata-develop
   environment:
     NODE_ENV: test
+    CT_URL: http://mymachine:9000
+    API_VERSION: v1
+    STAMPERY_TOKEN: token
   command: test
+  links:
+    - mongo
+  extra_hosts:
+    - "mymachine:${HOST_IP}"
+
+mongo:
+  image: mongo:3.4
+  command: --smallfiles
+  ports:
+    - "27017"
+  restart: always
