@@ -3,40 +3,40 @@ const ctRegisterMicroservice = require('ct-register-microservice-node');
 
 class DataJsonSerializer {
 
-    static async getDatasetTableName(dataset) {
+    static async getDatasetAttributes(dataset) {
         try {
             const result = await ctRegisterMicroservice.requestToMicroservice({
                 uri: `/dataset/${dataset}`,
                 method: 'GET',
                 json: true
             });
-            return result.data.attributes.tableName;
+            return result.data.attributes;
         } catch (e) {
             throw new Error(e);
         }
     }
 
     static async serializeElement(el) {
-        const tableName = await DataJsonSerializer.getDatasetTableName(el.dataset);
+        const datasetAttributes = await DataJsonSerializer.getDatasetAttributes(el.dataset);
 
         const result = {
             title: el.name,
             description: el.description || '',
-            keyword: [],
+            keyword: [el.sourceOrganization],
             modified: el.updatedAt,
             publisher: el.sourceOrganization || '',
             contactPoint: el.sourceOrganization || '',
-            identifier: el._id,
-            accessLevel: 'public',
+            identifier: el.dataset,
+            accessLevel: datasetAttributes.sandbox ? 'public' : 'restricted public',
             mbox: config.appSettings.dataJsonEmail,
-            accessLevelComment: '',
+            accessLevelComment: datasetAttributes.sandbox ? null : 'Accessible through free registration',
             distribution: [
                 {
-                    accessURL: `/v1/download/${el.dataset}?sql=select * from ${tableName}&format=csv`,
-                    format: 'csv'
+                    accessURL: encodeURI(`${config.appSettings.dataJsonBasePath}/query?sql=select * from ${el.dataset}&format=csv`),
+                    format: 'text/csv'
                 },
                 {
-                    accessURL: `/v1/download/${el.dataset}?sql=select * from ${tableName}&format=json`,
+                    accessURL: encodeURI(`${config.appSettings.dataJsonBasePath}/query?sql=select * from ${el.dataset}&format=json`),
                     format: 'application/json'
                 }
             ],
@@ -44,6 +44,10 @@ class DataJsonSerializer {
             license: el.license,
             spatial: el.countries
         };
+
+        if (datasetAttributes.sandbox) {
+            result.accessLevelComment = 'Requires free registration to access';
+        }
 
         if (el.dataSourceEndpoint) {
             result.distribution.push({
