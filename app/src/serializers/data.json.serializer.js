@@ -1,4 +1,5 @@
 const config = require('config');
+const logger = require('logger');
 const ctRegisterMicroservice = require('ct-register-microservice-node');
 
 class DataJsonSerializer {
@@ -17,46 +18,52 @@ class DataJsonSerializer {
     }
 
     static async serializeElement(el) {
-        const datasetAttributes = await DataJsonSerializer.getDatasetAttributes(el.dataset);
+        try {
+            const datasetAttributes = await DataJsonSerializer.getDatasetAttributes(el.dataset);
 
-        const result = {
-            title: el.name,
-            description: el.description || '',
-            keyword: [el.sourceOrganization],
-            modified: el.updatedAt,
-            publisher: el.sourceOrganization || '',
-            contactPoint: el.sourceOrganization || '',
-            identifier: el.dataset,
-            accessLevel: datasetAttributes.sandbox ? 'public' : 'restricted public',
-            mbox: config.appSettings.dataJsonEmail,
-            accessLevelComment: datasetAttributes.sandbox ? null : 'Accessible through free registration',
-            distribution: [
-                {
-                    accessURL: encodeURI(`${config.appSettings.dataJsonBasePath}/query?sql=select * from ${el.dataset}&format=csv`),
-                    format: 'text/csv'
-                },
-                {
-                    accessURL: encodeURI(`${config.appSettings.dataJsonBasePath}/query?sql=select * from ${el.dataset}&format=json`),
-                    format: 'application/json'
-                }
-            ],
-            webService: el.dataSourceEndpoint,
-            license: el.license,
-            spatial: el.countries
-        };
 
-        if (datasetAttributes.sandbox) {
-            result.accessLevelComment = 'Requires free registration to access';
+            const result = {
+                title: el.name,
+                description: el.description || '',
+                keyword: [el.sourceOrganization],
+                modified: el.updatedAt,
+                publisher: el.sourceOrganization || '',
+                contactPoint: el.sourceOrganization || '',
+                identifier: el.dataset,
+                accessLevel: datasetAttributes.sandbox ? 'public' : 'restricted public',
+                mbox: config.appSettings.dataJsonEmail,
+                accessLevelComment: datasetAttributes.sandbox ? null : 'Accessible through free registration',
+                distribution: [
+                    {
+                        accessURL: encodeURI(`${config.appSettings.dataJsonBasePath}/query?sql=select * from ${el.dataset}&format=csv`),
+                        format: 'text/csv'
+                    },
+                    {
+                        accessURL: encodeURI(`${config.appSettings.dataJsonBasePath}/query?sql=select * from ${el.dataset}&format=json`),
+                        format: 'application/json'
+                    }
+                ],
+                webService: el.dataSourceEndpoint,
+                license: el.license,
+                spatial: el.countries
+            };
+
+            if (datasetAttributes.sandbox) {
+                result.accessLevelComment = 'Requires free registration to access';
+            }
+
+            if (el.dataSourceEndpoint) {
+                result.distribution.push({
+                    accessURL: el.dataSourceEndpoint,
+                    format: 'source'
+                });
+            }
+
+            return result;
+        } catch(err) {
+            logger.error('Dataset does not exist');
+            return null;
         }
-
-        if (el.dataSourceEndpoint) {
-            result.distribution.push({
-                accessURL: el.dataSourceEndpoint,
-                format: 'source'
-            });
-        }
-
-        return result;
     }
 
     static async serialize(data) {
@@ -68,7 +75,8 @@ class DataJsonSerializer {
             return {};
         }
 
-        return await Promise.all(data.docs.map(async (el) => await DataJsonSerializer.serializeElement(el)));
+        const metadatas = await Promise.all(data.docs.map(async (el) => await DataJsonSerializer.serializeElement(el)));
+        return metadatas.filter(el => el !== null);
     }
 
 }
