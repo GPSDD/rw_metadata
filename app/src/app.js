@@ -58,7 +58,7 @@ koaValidate(app);
 
 loader.loadRoutes(app);
 
-const instance = app.listen(process.env.PORT, () => {
+const server = app.listen(process.env.PORT, () => {
     ctRegisterMicroservice.register({
         info: require('../microservice/register.json'),
         swagger: require('../microservice/public-swagger.json'),
@@ -79,4 +79,4 @@ const instance = app.listen(process.env.PORT, () => {
 
 logger.info('Server started in ', process.env.PORT);
 
-module.exports = instance;
+module.exports = server;

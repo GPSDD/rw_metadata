@@ -16,6 +16,7 @@
     "port": 27017
   },
   "appSettings": {
-    "dataJsonEmail": "info@data4sdgs.org"
+    "dataJsonEmail": "info@data4sdgs.org",
+    "dataJsonBasePath": "https://api.apihighways.org"
   }
 }
