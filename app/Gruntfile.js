@@ -19,9 +19,22 @@ module.exports = (grunt) => {
             test: {
                 options: {
                     script: 'app/index.js',
-                    node_env: 'dev',
+                    node_env: 'test',
                     port: process.env.PORT,
                     output: 'started'
+                }
+            }
+        },
+
+        mocha_istanbul: {
+            coverage: {
+                src: 'app/test', // the folder, not the files
+                options: {
+                    coverageFolder: 'coverage',
+                    mask: '**/*.spec.js',
+                    root: 'app/src',
+                    nodeExec: require.resolve('.bin/babel-node'),
+                    mochaOptions: ['--compilers', 'js:babel-register']
                 }
             }
         },
@@ -38,6 +51,7 @@ module.exports = (grunt) => {
             e2e: {
                 options: {
                     reporter: 'spec',
+                    timeout: 10000,
                     quiet: false, // Optionally suppress output to standard out (defaults to false)
                     clearRequireCache: true, // Optionally clear the require cache before running tests (defaults to false)
                 },
@@ -82,7 +96,9 @@ module.exports = (grunt) => {
 
     grunt.registerTask('unitTest', ['mochaTest:unit']);
 
-    grunt.registerTask('e2eTest', ['express:test', 'mochaTest:e2e']);
+    grunt.registerTask('e2eTest', ['mochaTest:e2e']);
+
+    grunt.registerTask('e2eTestCoverage', ['mocha_istanbul:coverage']);
 
     grunt.registerTask('e2eTest-watch', ['watch:e2eTest']);
 
