@@ -38,6 +38,9 @@ class MetadataRouter {
         logger.info(`Creating metadata of dataset: ${dataset}`);
         try {
             const user = ctx.request.body.loggedUser;
+            if (user.id === 'microservice' && ctx.request.body.userId) {
+                user.id = ctx.request.body.userId;
+            }
             const result = await MetadataService.create(user, dataset, ctx.request.body);
             ctx.body = await MetadataSerializer.serialize(result);
         } catch (err) {
