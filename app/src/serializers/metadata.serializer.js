@@ -5,14 +5,14 @@ const config = require('config');
 
 class MetadataSerializer {
 
-    static async getDatasetTableName(dataset) {
+    static async getDatasetAttributes(dataset) {
         try {
             const result = await ctRegisterMicroservice.requestToMicroservice({
                 uri: `/dataset/${dataset}`,
                 method: 'GET',
                 json: true
             });
-            return result.data.attributes.tableName;
+            return result.data.attributes;
         } catch (e) {
             throw new Error(e);
         }
@@ -20,8 +20,9 @@ class MetadataSerializer {
 
     static async serializeElement(el) {
         try {
-            const tableName = await MetadataSerializer.getDatasetTableName(el.dataset);
-            return {
+            const dataset = await MetadataSerializer.getDatasetAttributes(el.dataset);
+            const tableName = dataset.tableName;
+            let data = {
                 id: el._id,
                 type: 'metadata',
                 attributes: {
@@ -48,6 +49,13 @@ class MetadataSerializer {
                     status: el.status
                 }
             };
+            if (dataset.connectorType === 'worldbank') {
+                result.dataDownloadUrl =  {
+                    xml: el.dataSourceEndpoint.replace('format=json', 'format=xml'),
+                    json: el.dataSourceEndpoint
+                };
+            }
+            return data;
         } catch(err) {
             logger.error('Dataset does not exist');
             return null;

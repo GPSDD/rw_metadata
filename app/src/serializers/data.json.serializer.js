@@ -48,6 +48,19 @@ class DataJsonSerializer {
                 spatial: el.countries
             };
 
+            if (datasetAttributes.connectorType === 'worldbank') {
+                result.distribution =  [
+                    {
+                        accessURL: el.dataSourceEndpoint.replace('format=json', 'format=xml'),
+                        format: 'application/xml'
+                    },
+                    {
+                        accessURL: el.dataSourceEndpoint,
+                        format: 'application/json'
+                    }
+                ];
+            }
+
             if (datasetAttributes.sandbox) {
                 result.accessLevelComment = 'Requires free registration to access';
             }
