@@ -5,8 +5,6 @@ const chaiHttp = require('chai-http');
 const chaiDatetime = require('chai-datetime');
 const should = chai.should();
 const request = require('superagent');
-const Ajv = require('ajv');
-const metaSchema = require('ajv/lib/refs/json-schema-draft-04.json');
 const { validateStandardJSONMetadata, deserializeStandardJSONDataset } = require('./helpers');
 
 let requester;
@@ -14,21 +12,7 @@ let requester;
 chai.use(chaiHttp);
 chai.use(chaiDatetime);
 
-// Ajv changes to support draft-4
-const ajv = new Ajv({
-    meta: false, // optional, to prevent adding draft-06 meta-schema
-    extendRefs: true, // optional, current default is to 'fail', spec behaviour is to 'ignore'
-    unknownFormats: 'ignore',  // optional, current default is true (fail)
-    // ...
-});
-ajv.addMetaSchema(metaSchema);
-ajv._opts.defaultMeta = metaSchema.id;
-ajv._refs['http://json-schema.org/schema'] = 'http://json-schema.org/draft-04/schema';
-ajv.removeKeyword('propertyNames');
-ajv.removeKeyword('contains');
-ajv.removeKeyword('const');
-
-describe('Edit metadata', () => {
+describe('EDIT METADATA:', () => {
 
     before(async () => {
 
@@ -59,7 +43,6 @@ describe('Edit metadata', () => {
             .send();
     });
 
-    /* Create a Carto Dataset */
     it('Create metadata for a dataset', async () => {
         const responseOne = await requester
             .post(`/api/v1/dataset/${DATASET_METADATA_ONE.dataset}/metadata`)
@@ -80,6 +63,30 @@ describe('Edit metadata', () => {
         responseTwo.body.should.have.property('data').and.be.a('object');
 
         validateStandardJSONMetadata(createdDatasetTwo, DATASET_METADATA_TWO);
+    });
+
+    it('Create metadata for a dataset with invalid license', async () => {
+        const dataset = Object.assign({}, DATASET_METADATA_ONE, { license: 'this is an invalid license' });
+
+        const response = await requester
+            .post(`/api/v1/dataset/${DATASET_METADATA_ONE.dataset}/metadata`)
+            .send(dataset);
+
+        response.status.should.equal(400);
+        response.body.should.have.property('errors').and.be.a('array').and.lengthOf(1);
+        response.body.errors[0].should.have.property('detail').and.equal(`- license: is not a valid license type string - `);
+    });
+
+    it('Update metadata for a dataset with invalid license', async () => {
+        const dataset = Object.assign({}, DATASET_METADATA_TWO, { license: 'this is an invalid license' });
+
+        const response = await requester
+            .patch(`/api/v1/dataset/${DATASET_METADATA_ONE.dataset}/metadata`)
+            .send(dataset);
+
+        response.status.should.equal(400);
+        response.body.should.have.property('errors').and.be.a('array').and.lengthOf(1);
+        response.body.errors[0].should.have.property('detail').and.equal(`- license: is not a valid license type string - `);
     });
 
     it('Update metadata for a dataset', async () => {
