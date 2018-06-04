@@ -8,6 +8,7 @@ const request = require('superagent');
 const Ajv = require('ajv');
 const metaSchema = require('ajv/lib/refs/json-schema-draft-04.json');
 const { validateDataJSONMetadata } = require('./helpers');
+const schemaSource = 'https://raw.githubusercontent.com/project-open-data/project-open-data-dashboard/master/schema/non-federal-v1.1/'
 
 let requester;
 
@@ -75,7 +76,6 @@ describe('Access metadata (data.json format)', () => {
     });
 
     it('Get metadata for a single dataset (data.json format)', async () => {
-
         const response = await requester
             .get(`/api/v1/dataset/${DATASET_METADATA_ONE.dataset}/metadata?format=datajson`)
             .send(DATASET_METADATA_ONE);
@@ -83,15 +83,31 @@ describe('Access metadata (data.json format)', () => {
 
         response.status.should.equal(200);
 
-        const schemaJSON = await request('GET', `https://project-open-data.cio.gov/schema/1_0_final/single_entry.json`);
+        /**
+         * We are a custom spec that data.world uses, for which we don't have
+         * json schema files
+         */
+        // const vcardRequest = await request('GET', `${schemaSource}vcard-non-federal.json`);
+        // const distributionRequest = await request('GET', `${schemaSource}distribution.json`);
+        // const organizationRequest = await request('GET', `${schemaSource}organization.json`);
+        // const datasetSchemaRequest = await request('GET', `${schemaSource}dataset-non-federal.json`);
+        //
+        // const vcardJSON = JSON.parse(vcardRequest.text);
+        // const distributionJSON = JSON.parse(distributionRequest.text);
+        // const datasetSchemaJSON = JSON.parse(datasetSchemaRequest.text);
+        // const organizationSchemaJSON = JSON.parse(organizationRequest.text);
+        //
+        // const validate = ajv
+        //     .addSchema(vcardJSON)
+        //     .addSchema(distributionJSON)
+        //     .addSchema(organizationSchemaJSON)
+        //     .compile(datasetSchemaJSON);
+        //
+        // const valid = validate(response.body);
+        // if (!valid) {
+        //     throw Error(JSON.stringify(validate.errors));
+        // }
 
-        const result = ajv.addSchema(schemaJSON.body, 'singleEntry')
-            .validate('singleEntry', response.body);
-        if (!result) {
-            throw Error(ajv.errorsText());
-        }
-
-        response.body.should.be.a('object');
         validateDataJSONMetadata(loadedDataset, DATASET_METADATA_ONE, 'datajson');
     });
 
@@ -101,17 +117,27 @@ describe('Access metadata (data.json format)', () => {
 
 
         response.status.should.equal(200);
-        response.body.should.be.a('array');
 
-        const loadedDatasetOne = response.body[0];
-        const loadedDatasetTwo = response.body[1];
+        const loadedDatasetOne = response.body.dataset[0];
+        const loadedDatasetTwo = response.body.dataset[1];
 
-        const schemaJSON = await request('GET', `https://project-open-data.cio.gov/schema/1_0_final/catalog.json`);
-        const result = ajv.addSchema(schemaJSON.body, 'catalog')
-            .validate('catalog', response.body);
-        if (!result) {
-            throw Error(ajv.errorsText());
-        }
+        /**
+         * We are a custom spec that data.world uses, for which we don't have
+         * json schema files
+         */
+        // const catalogSchemaRequest = await request('GET', `${schemaSource}catalog.json`);
+        //
+        // const catalogSchemaJSON = JSON.parse(catalogSchemaRequest.text);
+        //
+        // const validate = ajv
+        //     .compile(catalogSchemaJSON);
+        //
+        // // const validate = ajv.getSchema('https://project-open-data.cio.gov/v1.1/schema/catalog.json#');
+        //
+        // const valid = validate(response.body);
+        // if (!valid) {
+        //     throw Error(JSON.stringify(validate.errors));
+        // }
 
         validateDataJSONMetadata(loadedDatasetOne, DATASET_METADATA_ONE);
         validateDataJSONMetadata(loadedDatasetTwo, DATASET_METADATA_TWO);

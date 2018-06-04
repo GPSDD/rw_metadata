@@ -99,7 +99,9 @@ class MetadataRouter {
         if (format === 'json') {
             ctx.body = await MetadataSerializer.serialize(result, link);
         } else if (format === 'datajson') {
-            ctx.body = await DataJsonSerializer.serializeAll(result);
+            ctx.body = {
+                dataset: await DataJsonSerializer.serializeAll(result),
+            };
         } else {
             ctx.throw(400, 'Invalid "format" value');
         }

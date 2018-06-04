@@ -55,6 +55,7 @@ function validateDataJSONMetadata(actual, expected) {
     actual.should.have.property('modified').and.be.a('string');
     actual.should.have.property('publisher').and.equal(expected.sourceOrganization);
     actual.should.have.property('title').and.equal(expected.name);
+    actual.should.have.property('license');
 
     new Date(actual.modified).should.beforeTime(new Date());
 }
