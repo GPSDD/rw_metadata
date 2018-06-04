@@ -5,28 +5,12 @@ const chaiHttp = require('chai-http');
 const chaiDatetime = require('chai-datetime');
 const should = chai.should();
 const request = require('superagent');
-const Ajv = require('ajv');
-const metaSchema = require('ajv/lib/refs/json-schema-draft-04.json');
 const { validateStandardJSONMetadata, deserializeStandardJSONDataset } = require('./helpers');
 
 let requester;
 
 chai.use(chaiHttp);
 chai.use(chaiDatetime);
-
-// Ajv changes to support draft-4
-const ajv = new Ajv({
-    meta: false, // optional, to prevent adding draft-06 meta-schema
-    extendRefs: true, // optional, current default is to 'fail', spec behaviour is to 'ignore'
-    unknownFormats: 'ignore',  // optional, current default is true (fail)
-    // ...
-});
-ajv.addMetaSchema(metaSchema);
-ajv._opts.defaultMeta = metaSchema.id;
-ajv._refs['http://json-schema.org/schema'] = 'http://json-schema.org/draft-04/schema';
-ajv.removeKeyword('propertyNames');
-ajv.removeKeyword('contains');
-ajv.removeKeyword('const');
 
 describe('Edit metadata', () => {
 

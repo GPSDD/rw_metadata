@@ -21,12 +21,12 @@ class DataJsonSerializer {
         try {
             const datasetAttributes = await DataJsonSerializer.getDatasetAttributes(el.dataset);
 
-
             const result = {
                 title: el.name,
                 description: el.description || '',
                 keyword: [el.sourceOrganization],
                 modified: el.updatedAt,
+                issued: el.createdAt,
                 publisher: el.sourceOrganization || '',
                 contactPoint: el.sourceOrganization || '',
                 identifier: el.dataset,
@@ -44,7 +44,7 @@ class DataJsonSerializer {
                     }
                 ],
                 webService: el.dataSourceEndpoint,
-                license: el.license,
+                license: el.license || null,
                 spatial: el.countries
             };
 
@@ -73,7 +73,7 @@ class DataJsonSerializer {
             }
 
             return result;
-        } catch(err) {
+        } catch (err) {
             logger.error('Dataset does not exist');
             return null;
         }
