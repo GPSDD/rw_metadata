@@ -87,7 +87,7 @@ const DATASET_METADATA_TWO = {
     info: {},
     units: {},
     columns: {},
-    license: 'CC 4.0',
+    license: 'CC-0',
     userId: '1a10d7c6e0a37126611fd7a7',
     createdAt: '2018-05-09T16:19:59.249Z',
     updatedAt: '2018-05-09T16:19:59.249Z',

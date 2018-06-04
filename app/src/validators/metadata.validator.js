@@ -3,6 +3,23 @@ const logger = require('logger');
 const MetadataNotValid = require('errors/metadataNotValid.error');
 const CloneNotValid = require('errors/cloneNotValid.error');
 
+const ACCEPTED_LICENSE_STRINGS = [
+    'Public Domain',
+    'CC-0',
+    'PDDL',
+    'CC-BY',
+    'CDLA-Permissive-1.0',
+    'ODC-BY',
+    'CC-BY-SA',
+    'CDLA-Sharing-1.0',
+    'ODC-ODbL',
+    'CC BY-NC',
+    'CC BY-ND',
+    'CC BY-NC-SA',
+    'CC BY-NC-ND',
+    'Other'
+];
+
 class MetadataValidator {
 
     static isArray(property) {
@@ -59,7 +76,6 @@ class MetadataValidator {
         koaObj.checkBody('dataSourceUrl').notEmpty().check(dataSourceUrl => MetadataValidator.isString(dataSourceUrl), 'should be a valid string');
         koaObj.checkBody('dataSourceEndpoint').optional().check(dataSourceEndpoint => MetadataValidator.isString(dataSourceEndpoint), 'should be a valid string');
         koaObj.checkBody('citation').optional().check(citation => MetadataValidator.isString(citation), 'should be a valid string');
-        koaObj.checkBody('license').optional().check(license => MetadataValidator.isString(license), 'should be a valid string');
         koaObj.checkBody('contries').optional().check(contries => MetadataValidator.isString(contries), 'should be a valid string');
         koaObj.checkBody('units').optional().check((units) => {
             if (MetadataValidator.isObject(units)) {
@@ -67,6 +83,13 @@ class MetadataValidator {
             }
             return false;
         }, 'should be a valid object');
+        koaObj.checkBody('license').optional().check(license => {
+            if (!MetadataValidator.isString(license)) {
+                return false;
+            }
+            return ACCEPTED_LICENSE_STRINGS.includes(license);
+        }, 'is not a valid license type string');
+
         koaObj.checkBody('info').optional().check((info) => {
             if (MetadataValidator.isObject(info)) {
                 return true;

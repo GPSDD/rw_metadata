@@ -12,7 +12,7 @@ let requester;
 chai.use(chaiHttp);
 chai.use(chaiDatetime);
 
-describe('Edit metadata', () => {
+describe('EDIT METADATA:', () => {
 
     before(async () => {
 
@@ -43,7 +43,6 @@ describe('Edit metadata', () => {
             .send();
     });
 
-    /* Create a Carto Dataset */
     it('Create metadata for a dataset', async () => {
         const responseOne = await requester
             .post(`/api/v1/dataset/${DATASET_METADATA_ONE.dataset}/metadata`)
@@ -64,6 +63,30 @@ describe('Edit metadata', () => {
         responseTwo.body.should.have.property('data').and.be.a('object');
 
         validateStandardJSONMetadata(createdDatasetTwo, DATASET_METADATA_TWO);
+    });
+
+    it('Create metadata for a dataset with invalid license', async () => {
+        const dataset = Object.assign({}, DATASET_METADATA_ONE, { license: 'this is an invalid license' });
+
+        const response = await requester
+            .post(`/api/v1/dataset/${DATASET_METADATA_ONE.dataset}/metadata`)
+            .send(dataset);
+
+        response.status.should.equal(400);
+        response.body.should.have.property('errors').and.be.a('array').and.lengthOf(1);
+        response.body.errors[0].should.have.property('detail').and.equal(`- license: is not a valid license type string - `);
+    });
+
+    it('Update metadata for a dataset with invalid license', async () => {
+        const dataset = Object.assign({}, DATASET_METADATA_TWO, { license: 'this is an invalid license' });
+
+        const response = await requester
+            .patch(`/api/v1/dataset/${DATASET_METADATA_ONE.dataset}/metadata`)
+            .send(dataset);
+
+        response.status.should.equal(400);
+        response.body.should.have.property('errors').and.be.a('array').and.lengthOf(1);
+        response.body.errors[0].should.have.property('detail').and.equal(`- license: is not a valid license type string - `);
     });
 
     it('Update metadata for a dataset', async () => {
