@@ -21,7 +21,23 @@ class MetadataSerializer {
     static async serializeElement(el) {
         try {
             const dataset = await MetadataSerializer.getDatasetAttributes(el.dataset);
+
+	    const datasetProvider = dataset.provider;
+	    logger.debug(`datasetProvider: ${datasetProvider}`);
             const tableName = dataset.tableName;
+
+	    var dataDownloadUrl;
+	    switch(datasetProvider) {
+	    case "gee":
+		dataDownloadUrl = {csv: null, json: null};
+		break;
+	    default:
+		dataDownloadUrl = {
+		    csv: `${encodeURI(config.appSettings.dataJsonBasePath)}/v1/download/${el.dataset}?sql=select * from ${tableName}&format=csv`,
+		    json: `${encodeURI(config.appSettings.dataJsonBasePath)}/v1/download/${el.dataset}?sql=select * from ${tableName}&format=json`
+                };
+	    }
+	    
             let data = {
                 id: el._id,
                 type: 'metadata',
@@ -33,10 +49,7 @@ class MetadataSerializer {
                     sourceOrganization: el.sourceOrganization,
                     dataSourceUrl: el.dataSourceUrl,
                     dataSourceEndpoint: el.dataSourceEndpoint,
-                    dataDownloadUrl: {
-                        csv: `${encodeURI(config.appSettings.dataJsonBasePath)}/v1/download/${el.dataset}?sql=select * from ${tableName}&format=csv`,
-                        json: `${encodeURI(config.appSettings.dataJsonBasePath)}/v1/download/${el.dataset}?sql=select * from ${tableName}&format=json`
-                    },
+                    dataDownloadUrl: dataDownloadUrl,
                     info: el.info,
                     citation: el.citation,
                     license: el.license,
