@@ -21,6 +21,56 @@ class DataJsonSerializer {
         try {
             const datasetAttributes = await DataJsonSerializer.getDatasetAttributes(el.dataset);
 
+            let distribution;
+
+            switch (datasetAttributes.provider) {
+
+                case 'resourcewatch':
+                    distribution = [
+                        {
+                            accessURL: encodeURI(`${el.dataSourceEndpoint}&format=csv`),
+                            format: 'text/csv'
+                        },
+                        {
+                            accessURL: encodeURI(`${el.dataSourceEndpoint}&format=json`),
+                            format: 'application/json'
+                        }
+                    ];
+                    break;
+                case 'worldbank':
+                    distribution = [
+                        {
+                            accessURL: el.dataSourceEndpoint.replace('format=json', 'format=xml'),
+                            format: 'application/xml'
+                        },
+                        {
+                            accessURL: el.dataSourceEndpoint,
+                            format: 'application/json'
+                        }
+                    ];
+                    break;
+                default:
+                    distribution = [
+                        {
+                            accessURL: encodeURI(`${config.appSettings.dataJsonBasePath}/query?sql=select * from ${el.dataset}&format=csv`),
+                            format: 'text/csv'
+                        },
+                        {
+                            accessURL: encodeURI(`${config.appSettings.dataJsonBasePath}/query?sql=select * from ${el.dataset}&format=json`),
+                            format: 'application/json'
+                        }
+                    ];
+                    break;
+
+            }
+
+            if (el.dataSourceEndpoint) {
+                distribution.push({
+                    accessURL: el.dataSourceEndpoint,
+                    format: 'source'
+                });
+            }
+
             const result = {
                 title: el.name,
                 description: el.description || '',
@@ -33,43 +83,14 @@ class DataJsonSerializer {
                 accessLevel: datasetAttributes.sandbox ? 'public' : 'restricted public',
                 mbox: config.appSettings.dataJsonEmail,
                 accessLevelComment: datasetAttributes.sandbox ? null : 'Accessible through free registration',
-                distribution: [
-                    {
-                        accessURL: encodeURI(`${config.appSettings.dataJsonBasePath}/query?sql=select * from ${el.dataset}&format=csv`),
-                        format: 'text/csv'
-                    },
-                    {
-                        accessURL: encodeURI(`${config.appSettings.dataJsonBasePath}/query?sql=select * from ${el.dataset}&format=json`),
-                        format: 'application/json'
-                    }
-                ],
+                distribution,
                 webService: el.dataSourceEndpoint,
                 license: el.license || null,
                 spatial: el.countries
             };
 
-            if (datasetAttributes.connectorType === 'worldbank') {
-                result.distribution =  [
-                    {
-                        accessURL: el.dataSourceEndpoint.replace('format=json', 'format=xml'),
-                        format: 'application/xml'
-                    },
-                    {
-                        accessURL: el.dataSourceEndpoint,
-                        format: 'application/json'
-                    }
-                ];
-            }
-
             if (datasetAttributes.sandbox) {
                 result.accessLevelComment = 'Requires free registration to access';
-            }
-
-            if (el.dataSourceEndpoint) {
-                result.distribution.push({
-                    accessURL: el.dataSourceEndpoint,
-                    format: 'source'
-                });
             }
 
             return result;
