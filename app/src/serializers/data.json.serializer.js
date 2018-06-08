@@ -77,8 +77,6 @@ class DataJsonSerializer {
                 keyword: [el.sourceOrganization],
                 modified: el.updatedAt,
                 issued: el.createdAt,
-                publisher: el.sourceOrganization || '',
-                contactPoint: el.sourceOrganization || '',
                 identifier: el.dataset,
                 accessLevel: datasetAttributes.sandbox ? 'public' : 'restricted public',
                 mbox: config.appSettings.dataJsonEmail,
@@ -91,6 +89,13 @@ class DataJsonSerializer {
 
             if (datasetAttributes.sandbox) {
                 result.accessLevelComment = 'Requires free registration to access';
+            }
+
+            if (el.sourceOrganization) {
+                result.publisher = {
+                    '@type': 'org:Organization',
+                    name: el.sourceOrganization
+                };
             }
 
             return result;

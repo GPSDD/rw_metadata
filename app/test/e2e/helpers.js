@@ -1,5 +1,3 @@
-
-
 function isArray(element) {
     if (element instanceof Array) {
         return true;
@@ -46,14 +44,16 @@ function validateStandardJSONMetadata(actual, expected) {
 function validateDataJSONMetadata(actual, expected) {
     actual.should.have.property('accessLevel').and.equal('restricted public');
     actual.should.have.property('accessLevelComment').and.equal('Accessible through free registration');
-    actual.should.have.property('contactPoint').and.equal(expected.sourceOrganization);
     actual.should.have.property('description').and.equal(expected.description);
     actual.should.have.property('distribution').and.be.a('array').and.lengthOf.at.least(2);
     actual.should.have.property('identifier').and.equal(expected.dataset);
     actual.should.have.property('keyword').and.be.a('array').and.lengthOf.at.least(1);
     actual.should.have.property('mbox').and.be.a('string');
     actual.should.have.property('modified').and.be.a('string');
-    actual.should.have.property('publisher').and.equal(expected.sourceOrganization);
+    actual.should.have.property('publisher').and.be.a('object').and.deep.equal({
+        '@type': 'org:Organization',
+        name: expected.sourceOrganization
+    });
     actual.should.have.property('title').and.equal(expected.name);
     actual.should.have.property('license');
 
