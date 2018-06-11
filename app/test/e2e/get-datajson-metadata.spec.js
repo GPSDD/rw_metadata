@@ -4,11 +4,11 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const chaiDatetime = require('chai-datetime');
 const should = chai.should();
-const request = require('superagent');
+// const request = require('superagent');
 const Ajv = require('ajv');
 const metaSchema = require('ajv/lib/refs/json-schema-draft-04.json');
 const { validateDataJSONMetadata } = require('./helpers');
-const schemaSource = 'https://raw.githubusercontent.com/project-open-data/project-open-data-dashboard/master/schema/non-federal-v1.1/'
+// const schemaSource = 'https://raw.githubusercontent.com/project-open-data/project-open-data-dashboard/master/schema/non-federal-v1.1/'
 
 let requester;
 

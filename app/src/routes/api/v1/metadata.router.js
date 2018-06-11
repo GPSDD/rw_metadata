@@ -145,7 +145,7 @@ class MetadataRouter {
 // Negative checking
 const authorizationMiddleware = async (ctx, next) => {
     // Check delete
-    if (ctx.request.method === 'DELETE' && (!ctx.request.query.language)) {
+    if (ctx.request.method === 'DELETE') {
         ctx.throw(400, 'Bad request');
         return;
     }

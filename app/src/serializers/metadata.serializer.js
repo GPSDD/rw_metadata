@@ -22,7 +22,33 @@ class MetadataSerializer {
         try {
             const dataset = await MetadataSerializer.getDatasetAttributes(el.dataset);
             const tableName = dataset.tableName;
-            let data = {
+
+            let dataDownloadUrl;
+
+            switch (dataset.provider) {
+
+                case 'resourcewatch':
+                    dataDownloadUrl = {
+                        csv: encodeURI(`${el.dataSourceEndpoint}&format=csv`),
+                        json: encodeURI(`${el.dataSourceEndpoint}&format=json`)
+                    };
+                    break;
+                case 'worldbank':
+                    dataDownloadUrl = {
+                        xml: encodeURI(el.dataSourceEndpoint.replace('format=json', 'format=xml')),
+                        json: encodeURI(el.dataSourceEndpoint)
+                    };
+                    break;
+                default:
+                    dataDownloadUrl = {
+                        csv: `${encodeURI(config.appSettings.dataJsonBasePath)}/v1/download/${el.dataset}?sql=select * from ${tableName}&format=csv`,
+                        json: `${encodeURI(config.appSettings.dataJsonBasePath)}/v1/download/${el.dataset}?sql=select * from ${tableName}&format=json`
+                    };
+                    break;
+
+            }
+
+            return {
                 id: el._id,
                 type: 'metadata',
                 attributes: {
@@ -33,10 +59,7 @@ class MetadataSerializer {
                     sourceOrganization: el.sourceOrganization,
                     dataSourceUrl: el.dataSourceUrl,
                     dataSourceEndpoint: el.dataSourceEndpoint,
-                    dataDownloadUrl: {
-                        csv: `${encodeURI(config.appSettings.dataJsonBasePath)}/v1/download/${el.dataset}?sql=select * from ${tableName}&format=csv`,
-                        json: `${encodeURI(config.appSettings.dataJsonBasePath)}/v1/download/${el.dataset}?sql=select * from ${tableName}&format=json`
-                    },
+                    dataDownloadUrl,
                     info: el.info,
                     citation: el.citation,
                     license: el.license,
@@ -49,14 +72,7 @@ class MetadataSerializer {
                     status: el.status
                 }
             };
-            if (dataset.connectorType === 'worldbank') {
-                result.dataDownloadUrl =  {
-                    xml: el.dataSourceEndpoint.replace('format=json', 'format=xml'),
-                    json: el.dataSourceEndpoint
-                };
-            }
-            return data;
-        } catch(err) {
+        } catch (err) {
             logger.error('Dataset does not exist');
             return null;
         }
@@ -66,11 +82,15 @@ class MetadataSerializer {
         const result = {};
         if (data) {
             if (data.docs) {
-                result.data = await Promise.all(data.docs.map(async(el) => { return await MetadataSerializer.serializeElement(el); }));
+                result.data = await Promise.all(data.docs.map(async (el) => {
+                    return await MetadataSerializer.serializeElement(el);
+                }));
                 result.data = result.data.filter(el => el !== null);
             } else {
                 if (Array.isArray(data)) {
-                    result.data = await Promise.all(data.map(async(el) => { return await MetadataSerializer.serializeElement(el); }));
+                    result.data = await Promise.all(data.map(async (el) => {
+                        return await MetadataSerializer.serializeElement(el);
+                    }));
                     result.data = result.data.filter(el => el !== null);
                 } else {
                     result.data = await MetadataSerializer.serializeElement(data);
