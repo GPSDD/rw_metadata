@@ -145,10 +145,6 @@ class MetadataRouter {
 // Negative checking
 const authorizationMiddleware = async (ctx, next) => {
     // Check delete
-    if (ctx.request.method === 'DELETE') {
-        ctx.throw(400, 'Bad request');
-        return;
-    }
     // Get user from query (delete) or body (post-patch)
     const user = Object.assign({}, ctx.request.query.loggedUser ? JSON.parse(ctx.request.query.loggedUser) : {}, ctx.request.body.loggedUser);
     if (user.id === 'microservice') {
