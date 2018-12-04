@@ -159,6 +159,7 @@ const authorizationMiddleware = async (ctx, next) => {
         ctx.throw(401, 'Unauthorized'); // if not logged or invalid ROLE-> out
         return;
     }
+    //allow users to add middleware
     // if (user.role === 'USER') {
     //     ctx.throw(403, 'Forbidden'); // if USER -> out
     //     return;
