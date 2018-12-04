@@ -155,12 +155,12 @@ const authorizationMiddleware = async (ctx, next) => {
         ctx.throw(401, 'Unauthorized'); // if not logged or invalid ROLE-> out
         return;
     }
-    if (user.role === 'USER') {
-        ctx.throw(403, 'Forbidden'); // if USER -> out
-        return;
-    }
-    if (user.role === 'MANAGER' || user.role === 'ADMIN') {
-        if (user.role === 'MANAGER' && ctx.request.method !== 'POST') { // extra check if a MANAGER wants to update or delete
+    // if (user.role === 'USER') {
+    //     ctx.throw(403, 'Forbidden'); // if USER -> out
+    //     return;
+    // }
+    if (user.role === 'MANAGER' || user.role === 'ADMIN' || user.role === 'USER') {
+        if ((user.role === 'MANAGER' || user.role === 'USER') && ctx.request.method !== 'POST') { // extra check if a MANAGER wants to update or delete
             const dataset = ctx.params.dataset;
             const permission = await MetadataService.hasPermission(user, dataset, ctx.request.body);
             if (!permission) {
