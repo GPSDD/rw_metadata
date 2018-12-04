@@ -39,6 +39,25 @@ class MetadataSerializer {
                         json: encodeURI(el.dataSourceEndpoint)
                     };
                     break;
+                case 'genericindex':
+                    dataDownloadUrl = {};
+                    break;
+                case 'hdx':
+                    if (el.dataSourceEndpoint.endsWith('.json')) {
+                        dataDownloadUrl = {
+                            json: encodeURI(el.dataSourceEndpoint)
+                        };
+                    } else if (el.dataSourceEndpoint.endsWith('.csv')) {
+                        dataDownloadUrl = {
+                            csv: encodeURI(el.dataSourceEndpoint)
+                        };
+                    }
+                    break;
+                case 'un':
+                    dataDownloadUrl = {
+                        json: encodeURI(el.dataSourceEndpoint)
+                    };
+                    break;
                 default:
                     dataDownloadUrl = {
                         csv: `${encodeURI(config.appSettings.dataJsonBasePath)}/v1/download/${el.dataset}?sql=select * from ${tableName}&format=csv`,

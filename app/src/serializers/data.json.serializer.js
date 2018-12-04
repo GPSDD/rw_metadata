@@ -49,6 +49,34 @@ class DataJsonSerializer {
                         }
                     ];
                     break;
+                case 'genericindex':
+                    distribution = [];
+                    break;
+                case 'hdx':
+                    distribution = [];
+                    if (el.dataSourceEndpoint.endsWith('.json')) {
+                        distribution = [
+                            {
+                                accessURL: el.dataSourceEndpoint,
+                                format: 'application/json'
+                            }];
+                    } else if (el.dataSourceEndpoint.endsWith('.csv')) {
+                        distribution = [
+                            {
+
+                                accessURL: el.dataSourceEndpoint,
+                                format: 'application/csv'
+                            }];
+                    }
+                    break;
+                case 'un':
+                    distribution = [
+                        {
+                            accessURL: el.dataSourceEndpoint,
+                            format: 'application/json'
+                        }
+                    ];
+                    break;
                 default:
                     distribution = [
                         {
